@@ -5,7 +5,7 @@
 
 <p>This component demonstrates fetching data from the server.</p>
 
-@if (forecasts == null)
+@if (qTypes == null)
 {
     <p><em>Loading...</em></p>
 }
@@ -14,20 +14,16 @@ else
     <table class="table">
         <thead>
             <tr>
-                <th>Date</th>
-                <th>Temp. (C)</th>
-                <th>Temp. (F)</th>
-                <th>Summary</th>
+                <th>Category</th>
+                <th>Type</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var forecast in forecasts)
+            @foreach (var qType in qTypes)
             {
                 <tr>
-                    <td>@forecast.Date.ToShortDateString()</td>
-                    <td>@forecast.TemperatureC</td>
-                    <td>@forecast.TemperatureF</td>
-                    <td>@forecast.Summary</td>
+                    <td>@qType.Category</td>
+                    <td>@qType.Type</td>
                 </tr>
             }
         </tbody>
@@ -36,10 +32,14 @@ else
 
 @code {
     private WeatherForecast[] forecasts;
+    private QuestionType[] qTypes;
 
     protected override async Task OnInitializedAsync()
     {
         forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("sample-data/weather.json");
+
+        var triviaResult = await Http.GetFromJsonAsync<TriviaResult>("http://localhost:7071/api/GetQuestionTypes?amount=5&difficulty=easy");
+        qTypes = triviaResult.Results;
     }
 
     public class WeatherForecast
@@ -51,5 +51,15 @@ else
         public string Summary { get; set; }
 
         public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    }
+
+    public class TriviaResult{
+        public QuestionType[] Results { get; set; }
+    }
+
+
+    public class QuestionType {
+        public string Category { get; set; } 
+        public string Type { get; set; }      
     }
 }

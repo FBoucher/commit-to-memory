@@ -7,6 +7,7 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using System.Net.Http;
 
 namespace Cloudies.Function
 {
@@ -19,17 +20,19 @@ namespace Cloudies.Function
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 
-            string name = req.Query["name"];
+            string amount = req.Query["amount"];
+            string difficulty = req.Query["difficulty"];
+            
 
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
-            name = name ?? data?.name;
-
-            string responseMessage = string.IsNullOrEmpty(name)
-                ? "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response."
-                : $"Hello, {name}. This HTTP triggered function executed successfully.";
-
-            return new OkObjectResult(responseMessage);
+            if( !String.IsNullOrEmpty(amount) && !String.IsNullOrEmpty(difficulty)) 
+            {
+                var client = new HttpClient();
+                string apiURL = $"https://opentdb.com/api.php?amount={amount}&difficulty={difficulty}&type=multiple";
+                var response = await client.GetStringAsync(apiURL);
+                return new OkObjectResult(response);
+            }
+            
+            return new OkObjectResult("NOTHING!!");
         }
     }
 }
