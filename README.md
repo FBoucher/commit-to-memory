@@ -1,2 +1,2 @@
 # commit-to-memory
-Online multiplayers game
+Online multi-players game
