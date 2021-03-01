@@ -11,10 +11,15 @@ using System.Net.Http;
 
 namespace Cloudies.Function
 {
-    public static class GetQuestionTypes
+    public class GetQuestionTypes
     {
+        private readonly HttpClient _httpClient;
+
+        public GetQuestionTypes(HttpClient httpClient) =>
+            _httpClient = httpClient;
+
         [FunctionName("GetQuestionTypes")]
-        public static async Task<IActionResult> Run(
+        public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
             ILogger log)
         {
@@ -26,9 +31,8 @@ namespace Cloudies.Function
 
             if( !String.IsNullOrEmpty(amount) && !String.IsNullOrEmpty(difficulty)) 
             {
-                var client = new HttpClient();
                 string apiURL = $"https://opentdb.com/api.php?amount={amount}&difficulty={difficulty}&type=multiple";
-                var response = await client.GetStringAsync(apiURL);
+                var response = await _httpClient.GetStringAsync(apiURL);
                 return new OkObjectResult(response);
             }
             
