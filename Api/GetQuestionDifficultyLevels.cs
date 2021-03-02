@@ -1,4 +1,4 @@
-using Api.Helper;
+﻿using Api.Helper;
 using Api.Model;
 
 using Microsoft.AspNetCore.Http;
@@ -10,17 +10,17 @@ using System.Linq;
 
 namespace Cloudies.Function
 {
-    public class GetQuestionTypes
+    public class GetQuestionDifficultyLevels
     {
-        [FunctionName("GetQuestionTypes")]
-        public QuestionType[] Run(
+        [FunctionName("GetQuestionDifficultyLevels")]
+        public QuestionDifficultyLevel[] Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
             ILogger log)
         {
-            QuestionType[] questionTypes = OTDBHelper.GetQuestionTypes()
-                .Select(x => new QuestionType { Id = x.id, Name = x.name })
+            QuestionDifficultyLevel[] levels = OTDBHelper.GetDifficultyLevels()
+                .Select(x => new QuestionDifficultyLevel { Id = x.id, Name = x.name })
                 .ToArray();
-            return questionTypes;
+            return levels;
         }
     }
 }

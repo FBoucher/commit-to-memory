@@ -5,3 +5,17 @@
 Welcome to your new app.
 
 <SurveyPrompt Title="How is Blazor working for you?" />
+
+<p>
+    <strong>
+        To avoid CORS errors while running this solution locally, please create a
+        local.settings.json file under the Api project with the following content:
+    </strong>
+
+    <pre><code>
+{
+  "IsEncrypted": false,
+  "Host": {"CORS": "*"}
+}
+    </code></pre>
+</p>
