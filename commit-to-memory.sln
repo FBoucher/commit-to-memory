@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30803.129
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Api", "Api\Api.csproj", "{48E627BC-861A-46DB-BDD6-34597FAB01C7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Api.Model", "Api.Model\Api.Model.csproj", "{D298B175-FC1C-4F78-B56B-6FE8EBACBF8A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "commit-to-memory", "client\commit-to-memory.csproj", "{BE84D1C1-4CF5-4BFF-9328-39255BEDCFB9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{48E627BC-861A-46DB-BDD6-34597FAB01C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{48E627BC-861A-46DB-BDD6-34597FAB01C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{48E627BC-861A-46DB-BDD6-34597FAB01C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{48E627BC-861A-46DB-BDD6-34597FAB01C7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D298B175-FC1C-4F78-B56B-6FE8EBACBF8A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D298B175-FC1C-4F78-B56B-6FE8EBACBF8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D298B175-FC1C-4F78-B56B-6FE8EBACBF8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D298B175-FC1C-4F78-B56B-6FE8EBACBF8A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE84D1C1-4CF5-4BFF-9328-39255BEDCFB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE84D1C1-4CF5-4BFF-9328-39255BEDCFB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE84D1C1-4CF5-4BFF-9328-39255BEDCFB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE84D1C1-4CF5-4BFF-9328-39255BEDCFB9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E46E038C-75BC-4BCE-95AA-AB03C2BDC3C3}
+	EndGlobalSection
+EndGlobal

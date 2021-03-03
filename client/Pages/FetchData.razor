@@ -1,65 +1,155 @@
 ﻿@page "/fetchdata"
 @inject HttpClient Http
 
-<h1>Weather forecast</h1>
+<h1>Questions</h1>
 
 <p>This component demonstrates fetching data from the server.</p>
 
-@if (qTypes == null)
+@if (initialized)
 {
-    <p><em>Loading...</em></p>
+    <label for="category">Categories</label>
+    <select name="category" @bind="selectedCategory">
+        <option value="" selected="selected">Any</option>
+        @foreach (var item in allCategories)
+        {
+            <option value="@item.Id">@item.Name</option>
+        }
+    </select>
+
+    <label for="difficulty">Difficulty</label>
+    <select name="difficulty" @bind="selectedDifficulty">
+        <option value="" selected="selected">Any</option>
+        @foreach (var item in allDifficultyLevels)
+        {
+            <option value="@item.Id">@item.Name</option>
+        }
+    </select>
+
+    <label for="type">Question type</label>
+    <select name="type" @bind="selectedType">
+        <option value="" selected="selected">Any</option>
+        @foreach (var item in allQuestionTypes)
+        {
+            <option value="@item.Id">@item.Name</option>
+        }
+    </select>
+
+    <label for="quantity">Quantity</label>
+    <select name="quantity" @bind="selectedQuantity">
+        @foreach (var item in Enumerable.Range(1, 50))
+        {
+            <option value="@item">@item</option>
+        }
+    </select>
+
+    @if (string.IsNullOrEmpty(sessionToken))
+    {
+        <button @onclick="StartSession">Create session</button>
+    }
+    else
+    {
+        <button @onclick="ExitSession">Exit session</button>
+    }
+
+    <button @onclick="GetQuestionCardsAsync">Get questions</button>
+
+    @if (!string.IsNullOrEmpty(sessionToken))
+    {
+        <p>A session is currently active. Each question will be displayed only once. Session token is @sessionToken.</p>
+    }
+
+    if (questionCards.Any())
+    {
+        <table>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Difficulty</th>
+                    <th>Type</th>
+                    <th>Question</th>
+                    <th>CorrectAnswer</th>
+                    <th>IncorrectAnswers</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var q in questionCards)
+                {
+                    <tr>
+                        <td>@q.Category</td>
+                        <td>@q.Difficulty</td>
+                        <td>@q.Type</td>
+                        <td>@q.Question</td>
+                        <td>@q.CorrectAnswer</td>
+                        <td>@string.Join(" | ", q.IncorrectAnswers)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+    <p><em>@message</em></p>
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Category</th>
-                <th>Type</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var qType in qTypes)
-            {
-                <tr>
-                    <td>@qType.Category</td>
-                    <td>@qType.Type</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <p><em>Loading...</em></p>
 }
 
 @code {
-    private WeatherForecast[] forecasts;
-    private QuestionType[] qTypes;
+    private string message;
+    private string sessionToken;
+
+    private bool initialized;
+
+    private QuestionCategory[] allCategories = Array.Empty<QuestionCategory>();
+    private QuestionDifficultyLevel[] allDifficultyLevels = Array.Empty<QuestionDifficultyLevel>();
+    private QuestionType[] allQuestionTypes = Array.Empty<QuestionType>();
+    private QuestionCard[] questionCards = Array.Empty<QuestionCard>();
+
+    private string selectedQuantity = "1";
+    private string selectedCategory;
+    private string selectedDifficulty;
+    private string selectedType;
 
     protected override async Task OnInitializedAsync()
     {
-        forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("sample-data/weather.json");
-
-        var triviaResult = await Http.GetFromJsonAsync<TriviaResult>("http://localhost:7071/api/GetQuestionTypes?amount=5&difficulty=easy");
-        qTypes = triviaResult.Results;
+        allCategories = await Http.GetFromJsonAsync<QuestionCategory[]>("http://localhost:7071/api/GetQuestionCategories");
+        allDifficultyLevels = await Http.GetFromJsonAsync<QuestionDifficultyLevel[]>("http://localhost:7071/api/GetQuestionDifficultyLevels");
+        allQuestionTypes = await Http.GetFromJsonAsync<QuestionType[]>("http://localhost:7071/api/GetQuestionTypes");
+        initialized = true;
     }
 
-    public class WeatherForecast
+    private async Task GetQuestionCardsAsync()
     {
-        public DateTime Date { get; set; }
+        message = null;
 
-        public int TemperatureC { get; set; }
+        var queryStringParameters = new Dictionary<string, string>()
+{
+                { "quantity", selectedQuantity},
+                { "category", selectedCategory},
+                { "type", selectedType},
+                { "difficulty", selectedDifficulty},
+                { "sessionToken", sessionToken},
+            };
 
-        public string Summary { get; set; }
+        string queryString = string.Join("&", queryStringParameters
+            .Where(x => !string.IsNullOrWhiteSpace(x.Value))
+            .OrderBy(x => x.Key)
+            .Select(x => $"{x.Key}={x.Value}"));
 
-        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+        questionCards = await Http.GetFromJsonAsync<QuestionCard[]>(string.IsNullOrEmpty(queryString)
+            ? "http://localhost:7071/api/GetQuestionCards"
+            : $"http://localhost:7071/api/GetQuestionCards?{queryString}");
+
+        if (!questionCards.Any())
+            message = "No question meets selected criterias.";
     }
 
-    public class TriviaResult{
-        public QuestionType[] Results { get; set; }
+    private async Task StartSession()
+    {
+        var response = await Http.PostAsync("http://localhost:7071/api/CreateTriviaSession", null);
+        var responseContent = await response.Content.ReadFromJsonAsync<TriviaSession>();
+        sessionToken = responseContent.Token;
     }
 
-
-    public class QuestionType {
-        public string Category { get; set; } 
-        public string Type { get; set; }      
-    }
+    private void ExitSession() => sessionToken = null;
 }
